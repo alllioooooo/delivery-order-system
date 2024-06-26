@@ -1,37 +1,49 @@
+using AutoMapper;
 using Domain.Abstractions.Orders;
 using Domain.Abstractions.Repositories;
-using Domain.Models.Orders;
 using Infrastructure.DataAccess.DbContext;
-using Infrastructure.DataAccess.Migrations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataAccess.Repositories;
 
-public class OrderRepository(ApplicationDbContext context) : IOrderRepository
+public class OrderRepository : IOrderRepository
 {
+    private readonly ApplicationDbContext _context;
+    private readonly IMapper _mapper;
+
+    public OrderRepository(ApplicationDbContext context, IMapper mapper)
+    {
+        _context = context;
+        _mapper = mapper;
+    }
+
     public async Task AddAsync(IOrder order)
     {
-        context.Orders.Add((Order)order);
-        await context.SaveChangesAsync();
+        var entity = _mapper.Map<Entities.Order>(order);
+        _context.Orders.Add(entity);
+        await _context.SaveChangesAsync();
+        _mapper.Map(entity, order);
     }
 
     public async Task DeleteAsync(string orderId)
     {
-        var order = await context.Orders.FindAsync(orderId);
-        if (order != null)
+        var entity = await _context.Orders.FindAsync(orderId);
+        if (entity != null)
         {
-            context.Orders.Remove(order);
-            await context.SaveChangesAsync();
+            _context.Orders.Remove(entity);
+            await _context.SaveChangesAsync();
         }
     }
 
     public async Task<IOrder?> GetByIdAsync(string orderId)
     {
-        return await context.Orders.FindAsync(orderId);
+        var entity = await _context.Orders.FindAsync(orderId);
+        return _mapper.Map<IOrder>(entity);
     }
 
-    public async Task<IEnumerable<IOrder?>> GetAllAsync()
+    public async Task<IEnumerable<IOrder>> GetAllAsync()
     {
-        return await context.Orders.ToListAsync();
+        var entities = await _context.Orders.ToListAsync();
+        return _mapper.Map<IEnumerable<IOrder>>(entities);
     }
 }

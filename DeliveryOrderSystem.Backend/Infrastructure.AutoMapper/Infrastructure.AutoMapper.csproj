@@ -8,13 +8,11 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="13.0.1" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\API.DTO\API.DTO.csproj" />
-      <ProjectReference Include="..\Domain.Abstractions\Domain.Abstractions.csproj" />
-      <ProjectReference Include="..\Domain.Models\Domain.Models.csproj" />
+      <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj" />
     </ItemGroup>
 
 </Project>

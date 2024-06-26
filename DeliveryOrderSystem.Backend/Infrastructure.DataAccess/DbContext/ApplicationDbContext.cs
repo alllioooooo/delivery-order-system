@@ -1,4 +1,4 @@
-using Domain.Models.Orders;
+using Infrastructure.DataAccess.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataAccess.DbContext;

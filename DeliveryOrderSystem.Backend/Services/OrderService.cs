@@ -8,6 +8,10 @@ public class OrderService(IOrderRepository orderRepository) : IOrderService
 {
     public async Task<IOrder> CreateOrderAsync(IOrder order)
     {
+        if (order.OrderId == null)
+        {
+            order.OrderId = Guid.NewGuid().ToString();
+        }
         await orderRepository.AddAsync(order);
         return order;
     }

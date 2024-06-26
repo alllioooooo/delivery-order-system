@@ -2,7 +2,7 @@ namespace Domain.Abstractions.Orders;
 
 public interface IOrder
 {
-    string OrderId { get; }
+    string OrderId { get; set; }
     string SenderCity { get; }
     string SenderAddress { get; }
     string ReceiverCity { get; }

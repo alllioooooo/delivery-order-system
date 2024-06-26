@@ -1,4 +1,5 @@
 using API.DTO;
+using AutoMapper;
 using Domain.Abstractions.Services;
 using Domain.Models.Orders;
 using Microsoft.AspNetCore.Mvc;
@@ -7,20 +8,29 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class OrdersController(IOrderService orderService)
-    : ControllerBase
+public class OrdersController : ControllerBase
 {
+    private readonly IOrderService _orderService;
+    private readonly IMapper _mapper;
+
+    public OrdersController(IOrderService orderService, IMapper mapper)
+    {
+        _orderService = orderService;
+        _mapper = mapper;
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrderById(string id)
     {
         try
         {
-            var order = await orderService.GetOrderByIdAsync(id);
+            var order = await _orderService.GetOrderByIdAsync(id);
             if (order == null)
             {
                 return NotFound();
             }
-            return Ok(order);
+            var orderDto = _mapper.Map<OrderDto>(order);
+            return Ok(orderDto);
         }
         catch (Exception ex)
         {
@@ -28,36 +38,36 @@ public class OrdersController(IOrderService orderService)
         }
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDto orderDto)
     {
         try
         {
-            var order = new OrderBuilder()
-                .SetSenderCity(orderDto.SenderCity)
-                .SetSenderAddress(orderDto.SenderAddress)
-                .SetReceiverCity(orderDto.ReceiverCity)
-                .SetReceiverAddress(orderDto.ReceiverAddress)
-                .SetWeight(orderDto.Weight)
-                .SetPickupDate(orderDto.PickupDate)
-                .Build();
-            
-            var createdOrder = await orderService.CreateOrderAsync(order);
+            Console.WriteLine("Starting to map DTO to Order.");
+            var order = _mapper.Map<Order>(orderDto);
+            Console.WriteLine($"DTO mapped successfully: {order}");
 
-            return CreatedAtAction(nameof(GetOrderById), new { id = createdOrder.OrderId }, createdOrder);
+            Console.WriteLine("Calling service to create order.");
+            var createdOrder = await _orderService.CreateOrderAsync(order);
+            Console.WriteLine($"Order created successfully: {createdOrder}");
+
+            var resultDto = _mapper.Map<OrderDto>(createdOrder);
+            return CreatedAtAction(nameof(GetOrderById), new { id = resultDto.OrderId }, resultDto);
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Error occurred while creating order: {orderDto}. Exception: {ex.Message}");
             return StatusCode(500, "An internal server error occurred.");
         }
     }
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrder(string id)
     {
         try
         {
-            await orderService.DeleteOrderAsync(id);
+            await _orderService.DeleteOrderAsync(id);
             return NoContent();
         }
         catch (Exception ex)
@@ -66,17 +76,27 @@ public class OrdersController(IOrderService orderService)
         }
     }
     
-    [HttpGet("AllOrderIds")]
+    [HttpGet]
     public async Task<IActionResult> GetAllOrderIds()
     {
         try
         {
-            var orders = await orderService.GetAllOrdersAsync();
-            var orderIds = orders.Select(o => o?.OrderId);
+            Console.WriteLine("Fetching all order IDs");
+            var orders = await _orderService.GetAllOrdersAsync();
+            var orderIds = orders.Select(o => o?.OrderId).ToList(); // ToList to trigger query execution
+
+            if (!orderIds.Any())
+            {
+                Console.WriteLine("No order IDs found");
+                return Ok(null);
+            }
+
+            Console.WriteLine($"Fetched {orderIds.Count} order IDs");
             return Ok(orderIds);
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Error occurred while fetching order IDs: {ex.Message}");
             return StatusCode(500, "An internal server error occurred.");
         }
     }
