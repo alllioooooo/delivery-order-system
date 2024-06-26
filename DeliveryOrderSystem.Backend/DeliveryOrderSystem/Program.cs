@@ -10,6 +10,15 @@ using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Настройка Cross-Origin Resource Sharing для фронтенда
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:3000") 
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 // Добавление контроллеров и AutoMapper
 builder.Services.AddControllers().AddApplicationPart(typeof(OrdersController).Assembly);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -38,6 +47,8 @@ if (app.Environment.IsDevelopment())
 
 // Базовые настройки HTTP
 app.UseHttpsRedirection();
+
+app.UseCors("AllowSpecificOrigin"); 
 
 // Настройка маршрутизации
 app.UseRouting();
