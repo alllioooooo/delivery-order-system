@@ -56,7 +56,7 @@ source ~/.zshrc
 
 1. Перейдите в директорию фронтенд-проекта:
     ```shell
-    cd ~/delivery-order-system/
+    cd ~/delivery-order-system/delivery-order-system.frontend
     ```
 2. Установите зависимости:
     ```shell
