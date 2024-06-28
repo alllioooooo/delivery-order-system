@@ -10,7 +10,7 @@ const Card = ({ children, url }) => {
             style={{ objectFit: "cover" }}
           />
         </div>
-        <div className="p-5 w-3/5 flex flex-col">{children}</div>
+        <div className="p-5 w-3/5 flex overflow-auto flex-col">{children}</div>
       </div>
     </section>
   );
