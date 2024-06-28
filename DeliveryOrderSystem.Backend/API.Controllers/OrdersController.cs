@@ -83,7 +83,7 @@ public class OrdersController : ControllerBase
         {
             Console.WriteLine("Fetching all order IDs");
             var orders = await _orderService.GetAllOrdersAsync();
-            var orderIds = orders.Select(o => o?.OrderId).ToList(); // ToList to trigger query execution
+            var orderIds = orders.Select(o => o?.OrderId).ToList();
 
             if (!orderIds.Any())
             {
