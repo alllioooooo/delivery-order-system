@@ -67,7 +67,7 @@ source ~/.zshrc
     npm run dev
     ```
 
-Фронтенд будет доступен по адресу: [http://localhost:5173](http://localhost:5173).
+Фронтенд будет доступен по адресу: [http://localhost:5173](http://localhost:5174).
 
 ## Примечания
 
